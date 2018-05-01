@@ -13,9 +13,11 @@ export class HeroDetailComponent implements OnChanges {
 
   heroForm: FormGroup; // <--- heroForm is of type FormGroup
   states = states;
-
+  nameChangeLog: string[] = [];
+  
   constructor(private fb: FormBuilder) { // <--- inject FormBuilder
     this.createForm();
+    this.logNameChange();
   }
 
   createForm() {
@@ -55,7 +57,41 @@ export class HeroDetailComponent implements OnChanges {
   // });
   // }
   
+  logNameChange() {
+    const nameControl = this.heroForm.get('name');
+    nameControl.valueChanges.forEach(
+      (value: string) => this.nameChangeLog.push(value)
+    );
+  }
+  
+  prepareSaveHero(): Hero {
+    const formModel = this.heroForm.value;
+
+    // deep copy of form model lairs
+    const secretLairsDeepCopy: Address[] = formModel.secretLairs.map(
+      (address: Address) => Object.assign({}, address)
+    );
+
+    // return new `Hero` object containing a combination of original hero value(s)
+    // and deep copies of changed form model values
+    const saveHero: Hero = {
+      id: this.hero.id,
+      name: formModel.name as string,
+      // addresses: formModel.secretLairs // <-- bad!
+      addresses: secretLairsDeepCopy
+    };
+    return saveHero;
+  }
+  
+  revert() { this.rebuildForm(); }
+  
   ngOnChanges(){
+    this.rebuildForm();
+  }
+  
+  onSubmit() {
+    this.hero = this.prepareSaveHero();
+    this.heroService.updateHero(this.hero).subscribe(/* error handling */);
     this.rebuildForm();
   }
 

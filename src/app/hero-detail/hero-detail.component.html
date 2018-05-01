@@ -1,6 +1,12 @@
 <h2>Hero Detail</h2>
 <h3><i>A FormGroup with multiple FormControls</i></h3>
 <form [formGroup]="heroForm">
+  <div style="margin-bottom: 1em">
+  <button type="submit"
+          [disabled]="heroForm.pristine" class="btn btn-success">Save</button> &nbsp;
+  <button type="button" (click)="revert()"
+          [disabled]="heroForm.pristine" class="btn btn-danger">Revert</button>
+  </div>
   <div class="form-group">
     <label class="center-block">Name:
       <input class="form-control" formControlName="name">
@@ -56,3 +62,6 @@
 <p>Form value: {{ heroForm.value | json }}</p>
 <p>Name value: {{ heroForm.get('name').value }}</p>
 <p>Street: {{ heroForm.get('address.street').value }}</p>
+
+<h4>Name change log</h4>
+<div *ngFor="let name of nameChangeLog">{{name}}</div>
